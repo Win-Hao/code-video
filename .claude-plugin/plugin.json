@@ -1,0 +1,19 @@
+{
+  "name": "code-video",
+  "version": "0.1.0",
+  "description": "Make short videos and animations with code: the agent asks what you want, writes a seven-block prompt for it (role / context / task / specs / style / avoid / check), draws every frame in HTML, Canvas, WebGL, p5.js or Three.js and renders an MP4. Seven tested reference looks.",
+  "keywords": [
+    "skill",
+    "video",
+    "animation",
+    "motion-design",
+    "prompt",
+    "threejs",
+    "p5js",
+    "webgl"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Win-Hao"
+  }
+}

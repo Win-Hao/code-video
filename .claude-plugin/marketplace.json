@@ -1,0 +1,14 @@
+{
+  "name": "code-video",
+  "owner": {
+    "name": "Win-Hao"
+  },
+  "plugins": [
+    {
+      "name": "code-video",
+      "source": "./",
+      "description": "Make short videos and animations with code — the agent asks first, writes a prompt for this request, draws every frame and renders an MP4."
+    }
+  ],
+  "description": "code-video: make short videos and animations with code. The agent asks what you want, writes a seven-block prompt tailored to the request, draws every frame in the browser (Canvas, WebGL, SVG, p5.js, Three.js), renders an MP4 with Playwright and FFmpeg, and checks sampled frames before delivering. Seven tested reference looks: pixel art, retro arcade, hand-drawn, low-poly 3D, UI motion, history explainer, one-line free rein."
+}
