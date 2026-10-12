@@ -24,9 +24,9 @@
 
 An agent skill for making short videos and animations without a video editor. Claude doesn't generate video; it writes code. Here the code is a web page that draws second *t* of the video with Canvas, WebGL, SVG, p5.js or Three.js, and `render.mjs` screenshots it frame by frame in a headless browser and pipes the frames into FFmpeg. A different look is a different way of drawing: pixel art is a tiny canvas scaled up with smoothing off, an old TV is a shader laid over it, hand-drawn is a brush library that redraws twelve times a second.
 
-Most of the skill is about what happens before the code. The agent **asks first**, one round, at most five questions: where the video goes and who watches it, what to show, which look, size and length, what to avoid. Then it **writes a prompt for this request** in seven blocks, shows it to you, and builds only after you say OK. It checks sampled frames against the prompt's own checklist, adds the unwanted habits that showed up to the avoid list, and hands you the folder.
+Most of the skill is about what happens before the code. The agent **asks first**, one round, at most five questions: where the video goes and who watches it, what to show, which look, size and length, what to avoid. Then it **fills in a prompt for this request**: the agent writes every block itself, and the look is a recommendation, not a rule; it can pick from the seven tested references or design something new. It shows you the prompt, builds once you say OK (or hands the prompt to a subagent with a clean context), checks sampled frames against the prompt's own checklist, adds any unwanted habits that showed up, and hands you the folder. The skill itself stays light: a path, a few hard rules (frames depend only on time, facts sourced, assets licensed) and the tools; how the video looks is left to the agent.
 
-## The prompt: seven blocks
+## The prompt: six blocks, filled by the agent
 
 | Block | What goes in | Why |
 |---|---|---|
@@ -34,11 +34,10 @@ Most of the skill is about what happens before the code. The agent **asks first*
 | `context` | where it's used, who watches, so what's needed | once the model knows why, it fills in what you didn't write |
 | `task` | what to show, in what order, what viewers should remember | your words first |
 | `specs` | size, frame rate, length, loop or not, sound or not | "30 frames per second", never "30 frames" — that was read as 30 frames in total |
-| `style` | the technique and the tricks that make the look, each with a reason | pixel art: tiny canvas, integer scale, smoothing off, ≤ 16 colors |
-| `avoid` | specific things to stay away from, by name | "don't make it look AI-made" only swaps one default look for another |
+| `style` | recommended technique and look, each with a reason, plus what you don't want, by name; a recommendation, not a rule | pixel art: tiny canvas, integer scale, smoothing off, ≤ 16 colors; "don't make it look AI-made" only swaps one default look for another, so name the specific thing |
 | `check` | what to inspect in sampled frames | specific beats vague: holes in 3D, color count in pixel art, dates in a history |
 
-The tag names are this skill's own. Anthropic's [prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices) recommends separating instructions, context and examples with consistently named XML tags, explaining why, and naming what you don't want; it doesn't prescribe a fixed set of tags.
+The tag names are this skill's own (the tested examples below still have a separate `avoid` block; it now lives in `style`). Anthropic's [prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices) recommends separating instructions, context and examples with consistently named XML tags, explaining why, and naming what you don't want; it doesn't prescribe a fixed set of tags.
 
 <details>
 <summary>Example: the pixel-art prompt (translated from the tested Chinese original; 【】 marks what you fill in)</summary>
@@ -212,7 +211,7 @@ bash $S/contact.sh video.mp4 check/contact-sheet.png        # frame 0 + 5 evenly
 
 - **Ask, then write the prompt for this request.** A one-line "go wild" prompt gave a different look on every run; writing the theme, the palette and the number of scenes into it made it stable.
 - **Say why.** With "viewers should get what the app does at a glance" in the context, the model labeled every segment of a promo with the feature name on its own.
-- **Name the clichés.** "Don't make it look AI-made" just trades one default look for another (Anthropic's guide for Opus 5.5 makes the same point about frontend design). Naming them is what `avoid` is for: no purple neon, no gradient buttons, nothing fading in all at once.
+- **Name the clichés.** "Don't make it look AI-made" just trades one default look for another (Anthropic's guide for Opus 5.5 makes the same point about frontend design). Name them in `style`: no purple neon, no gradient buttons, nothing fading in all at once.
 - **Frames depend only on time.** No timers, no requestAnimationFrame, seeded random numbers: the same `t` always draws the same picture, so a re-render is identical and any frame can be checked on its own.
 - **Check the transitions.** In testing, most real defects (blank frames, things leaving the frame, parts flying off) showed up at the moment of a transition, which evenly spaced samples miss. The skill renders the first two frames of every transition as stills.
 - **Use a real spring.** Improvised spring formulas often settle within the first 20% of the move and read as teleporting; the skill ships a damped spring, and an ease curve for cursors, because a spring overshoots and the cursor misses its target.
